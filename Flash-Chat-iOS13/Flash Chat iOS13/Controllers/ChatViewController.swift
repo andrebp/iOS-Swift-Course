@@ -52,8 +52,11 @@ class ChatViewController: UIViewController {
                     }
                     DispatchQueue.main.async {
                         self.tableView.reloadData()
-                        let indexPath = IndexPath(row: (self.messages.count - 1), section: 0)
-                        self.tableView.scrollToRow(at: indexPath, at: .top, animated: false)
+                        
+                        if self.messages.count - 1 > 0 {
+                            let indexPath = IndexPath(row: (self.messages.count - 1), section: 0)
+                            self.tableView.scrollToRow(at: indexPath, at: .top, animated: false)
+                        }
                     }
                 }
             }
