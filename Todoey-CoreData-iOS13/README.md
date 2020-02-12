@@ -1,7 +1,5 @@
 # Todoey ✓
 
-## Our Goal
-
 The objective of this project is to learn more about saving data in iOS, by using UserDefaults and then Core Data. The app built is a todolist app to keep track of all your tasks.
 
 
