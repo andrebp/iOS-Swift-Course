@@ -9,27 +9,27 @@
 import UIKit
 import RealmSwift
 
-class CategoryViewController: UITableViewController {
-
+class CategoryViewController: SwipeTableViewController {
+    
     let realm = try! Realm()
     
-    var categoryArray : Results<Category>?
-
+    var categories : Results<Category>?
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         loadCategories()
     }
-
-    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
     
+    @IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
+        
         var textField = UITextField()
         
         let alert = UIAlertController(title: "Add New Category", message: nil, preferredStyle: .alert)
         
         let action = UIAlertAction(title: "Add Category", style: .default) { (action) in
             if let userInput = textField.text {
-               
+                
                 let newCategory = Category()
                 newCategory.name = userInput
                 
@@ -38,7 +38,7 @@ class CategoryViewController: UITableViewController {
                 self.tableView.reloadData()
             }
         }
-    
+        
         alert.addAction(action)
         alert.addTextField { (field) in
             field.placeholder = "Create new category"
@@ -59,23 +59,38 @@ class CategoryViewController: UITableViewController {
     }
     
     func loadCategories() {
-        categoryArray = realm.objects(Category.self)
-
+        categories = realm.objects(Category.self)
+        
         tableView.reloadData()
+    }
+    
+    override func updateModel(at indexPath : IndexPath) {
+        if let category = self.categories?[indexPath.row]{
+            do {
+                try self.realm.write {
+                    self.realm.delete(category)
+                }
+            } catch {
+                print("Error deleting category, \(error)")
+            }
+        }
+        
     }
     
 }
 
 
 extension CategoryViewController {
+    
+    
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return categoryArray?.count ?? 1
+        return categories?.count ?? 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
-        cell.textLabel?.text = categoryArray?[indexPath.row].name ?? "No Categories added yet"
+        cell.textLabel?.text = categories?[indexPath.row].name ?? "No Categories added yet"
         
         return cell
     }
@@ -91,7 +106,7 @@ extension CategoryViewController {
             let destinationVC = segue.destination as! TodoListViewController
             
             if let indexPath = tableView.indexPathForSelectedRow {
-                destinationVC.selectedCategory = categoryArray?[indexPath.row]
+                destinationVC.selectedCategory = categories?[indexPath.row]
             }
         }
     }
